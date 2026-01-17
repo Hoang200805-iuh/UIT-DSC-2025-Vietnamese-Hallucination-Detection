@@ -25,7 +25,7 @@ A modular, production-ready solution for detecting and classifying hallucination
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/Hoang200805-iuh/UIT-DSC-2025
+git clone https://github.com/Hoang200805-iuh/UIT-DSC-2025-Vietnamese-Hallucination-Detection
 cd uit-dsc-2025
 pip install -r requirements.txt
 ```
