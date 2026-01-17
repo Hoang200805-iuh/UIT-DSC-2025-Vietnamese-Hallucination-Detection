@@ -1,0 +1,175 @@
+# Base Configuration for UIT-DSC Challenge B
+
+# ============================================
+# Model Configuration
+# ============================================
+model:
+  name: "vinai/phobert-base"
+  max_length: 256
+  num_classes: 3
+  hidden_size: 768
+
+# ============================================
+# Training Configuration
+# ============================================
+training:
+  seed: 42
+  epochs: 5
+  folds: 5
+  batch_size: 6
+  gradient_accumulation_steps: 2
+  
+  # Optimizer
+  learning_rate: 2e-5
+  weight_decay: 0.01
+  warmup_ratio: 0.06
+  
+  # Scheduler
+  use_cosine_schedule: true
+  use_warmup: true
+  
+  # Mixed precision
+  use_fp16: true
+  use_bf16: false
+  enable_grad_checkpoint: true
+
+# ============================================
+# Features Configuration
+# ============================================
+features:
+  # Retriever
+  use_retriever: true
+  retriever_view: 0  # 0=idf, 1=idf+numeric, 2=idf+caps
+  use_neighbor: true
+  neighbor_k: 1
+  pr_floor_ratio: 0.85
+  
+  # Custom head
+  use_custom_head: true
+  use_corr_features: true
+  corr_mlp_dims: 18
+  corr_mlp_hidden: 64
+  
+  # Two-stage head
+  use_two_stage_head: true
+  use_segment_masks: true
+
+# ============================================
+# Loss Weights Configuration
+# ============================================
+losses:
+  # Main loss
+  use_label_smoothing: true
+  label_smoothing: 0.02
+  
+  # Auxiliary losses
+  hall_lambda: 0.20
+  ie_lambda: 0.30
+  
+  # IE losses
+  use_focal_loss: true
+  focal_gamma: 2.0
+  focal_alpha: 0.6
+  
+  use_supcon: true
+  supcon_lambda: 0.10
+  supcon_tau: 0.07
+  
+  use_margin: true
+  margin_m: 0.5
+  margin_lambda: 0.20
+  margin_schedule: true
+  margin_start: 0.45
+  margin_end: 0.80
+
+# ============================================
+# Augmentation Configuration
+# ============================================
+augmentation:
+  use_rdrop: true
+  rdrop_alpha: 0.20
+  
+  use_fgm: true
+  fgm_eps: 1.0
+  
+  use_ema: true
+  ema_decay: 0.9999
+  
+  use_awp: false
+  awp_eps: 0.001
+
+# ============================================
+# Inference Configuration
+# ============================================
+inference:
+  use_tta: true
+  tta_passes: 9
+  
+  # Fusion
+  fusion_main_weight: 0.8
+  fusion_aux_weight: 0.2
+  
+  # Per-class bias
+  use_per_class_bias: true
+  class_bias: [-0.05, 0.02, 0.02]
+  
+  # Temperature scaling
+  use_temperature_scaling: true
+  temp_scaling_iters: 2
+  temp_scaling_grid_start: 0.85
+  temp_scaling_grid_end: 1.35
+
+# ============================================
+# Data Configuration
+# ============================================
+data:
+  train_path: "data/vihallu-train.csv"
+  test_path: "data/vihallu-public-test.csv"
+  
+  # Text columns
+  context_col: "context"
+  prompt_col: "prompt"
+  response_col: "response"
+  label_col: "label"
+  id_col: "id"
+  
+  # Classes
+  classes:
+    - "no"
+    - "intrinsic"
+    - "extrinsic"
+  
+  # Preprocessing
+  use_word_segmentation: true
+  add_segment_tokens: true
+  segment_tokens: ["[CTX]", "[PRM]", "[RSP]"]
+
+# ============================================
+# Output Configuration
+# ============================================
+output:
+  output_dir: "outputs/"
+  models_dir: "models/"
+  logs_dir: "logs/"
+  
+  # Save
+  save_oof_details: true
+  save_hard_errors: true
+  save_metrics: true
+  save_confusion_matrix: true
+
+# ============================================
+# Logging Configuration
+# ============================================
+logging:
+  logging_steps: 50
+  log_model_info: true
+  log_data_info: true
+
+# ============================================
+# Device Configuration
+# ============================================
+device:
+  use_cuda: true
+  num_workers: 2
+  num_proc: 2
